@@ -24,7 +24,7 @@ typedef struct block
     char Cas_mer[5];
     char Dat_mer[9];
     struct block *next;
-} BLOCK, *p_BLOCK;
+} BLOCK;
 
 void n(BLOCK **start)
 {
@@ -32,18 +32,11 @@ void n(BLOCK **start)
     if (f == NULL)
     {
         printf("Zaznamy neboli nacitane!\n");
+        return;
     }
     else
     {
-        while (fgets(buff, sizeof(buff), f) != NULL)
-        {
-            BLOCK *new = (BLOCK *)malloc(sizeof(BLOCK));
-            new->id = (ID *)malloc(sizeof(ID));
-            new->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
-
-            new->next = *start;
-            *start = new;
-        }
+        char buff[100];
 
         while (*start != NULL)
         {
@@ -53,10 +46,58 @@ void n(BLOCK **start)
             free(temp->poz_mod);
             free(temp);
         }
+        int counter = 0;
+        char s_number[100];
+        BLOCK *temp = *start;
+        while (fgets(buff, sizeof(buff), f) != NULL)
+        {
+            BLOCK *new = (BLOCK *)malloc(sizeof(BLOCK));
+            new->id = (ID *)malloc(sizeof(ID));
+            new->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
+            fgets(buff, sizeof(buff), f);
+            buff[5] = '\0';
+            strncpy(new->id->bigl, buff, 1);
+            strncpy(s_number, buff + 1, 3);
+            new->id->number = atoi(s_number);
+            strncpy(new->id->small, buff + 4, 1);
 
-        char buff[100];
+            fgets(buff, sizeof(buff), f);
+            buff[16] = '\0';
+            strncpy(new->poz_mod->latitude, buff, 8);
+            strncpy(new->poz_mod->longitude, buff + 8, 8);
 
-                fclose(f);
+            fgets(buff, sizeof(buff), f);
+            buff[2] = '\0';
+            strncpy(new->Typ_mer_vel, buff, 2);
+
+            fgets(buff, sizeof(buff), f);
+            buff[6] = '\0';
+            strncpy(s_number, buff, 6);
+            new->Hodnota = atof(s_number);
+
+            fgets(buff, sizeof(buff), f);
+            buff[4] = '\0';
+            strncpy(new->Cas_mer, buff, 4);
+
+            fgets(buff, sizeof(buff), f);
+            buff[8] = '\0';
+            strncpy(new->Dat_mer, buff, 8);
+
+            if (*start == NULL)
+            {
+                *start = new;
+                temp = *start;
+            }
+            else
+            {
+                temp->next = new;
+                temp = new;
+            }
+            counter++;
+        }
+        temp->next = NULL;
+        fclose(f);
+        printf("Načítalo sa %d záznamov\n", counter);
     }
 }
 
@@ -120,7 +161,7 @@ int main(void)
             r();
             break;
         case 'k':
-            k();
+            k(&start);
             break;
         }
     } while (letter != 'k');
