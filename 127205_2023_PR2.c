@@ -26,7 +26,7 @@ typedef struct block
     struct block *next;
 } BLOCK;
 
-void n(BLOCK **start)
+void n(BLOCK **start, int *counter)
 {
     FILE *f = fopen("dataloger_V2.txt", "r");
     if (f == NULL)
@@ -46,7 +46,7 @@ void n(BLOCK **start)
             free(temp->poz_mod);
             free(temp);
         }
-        int counter = 0;
+        *counter = 0;
         char s_number[100];
         BLOCK *temp = *start;
         while (fgets(buff, sizeof(buff), f) != NULL)
@@ -54,21 +54,27 @@ void n(BLOCK **start)
             BLOCK *new = (BLOCK *)malloc(sizeof(BLOCK));
             new->id = (ID *)malloc(sizeof(ID));
             new->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
+
             fgets(buff, sizeof(buff), f);
             buff[5] = '\0';
             strncpy(new->id->bigl, buff, 1);
+            new->id->bigl[1] = '\0';
             strncpy(s_number, buff + 1, 3);
             new->id->number = atoi(s_number);
             strncpy(new->id->small, buff + 4, 1);
+            new->id->small[1] = '\0';
 
             fgets(buff, sizeof(buff), f);
             buff[16] = '\0';
             strncpy(new->poz_mod->latitude, buff, 8);
+            new->poz_mod->latitude[8] = '\0';
             strncpy(new->poz_mod->longitude, buff + 8, 8);
+            new->poz_mod->longitude[8] = '\0';
 
             fgets(buff, sizeof(buff), f);
             buff[2] = '\0';
             strncpy(new->Typ_mer_vel, buff, 2);
+            new->Typ_mer_vel[2] = '\0';
 
             fgets(buff, sizeof(buff), f);
             buff[6] = '\0';
@@ -78,10 +84,12 @@ void n(BLOCK **start)
             fgets(buff, sizeof(buff), f);
             buff[4] = '\0';
             strncpy(new->Cas_mer, buff, 4);
+            new->Cas_mer[4] = '\0';
 
             fgets(buff, sizeof(buff), f);
             buff[8] = '\0';
             strncpy(new->Dat_mer, buff, 8);
+            new->Dat_mer[8] = '\0';
 
             if (*start == NULL)
             {
@@ -93,16 +101,32 @@ void n(BLOCK **start)
                 temp->next = new;
                 temp = new;
             }
-            counter++;
+            (*counter)++;
         }
         temp->next = NULL;
         fclose(f);
-        printf("Načítalo sa %d záznamov\n", counter);
+        printf("Načítalo sa %d záznamov\n", (*counter));
     }
 }
 
-void v()
+void v(BLOCK **start, int counter)
 {
+    if (*start == NULL)
+    {
+        printf("záznamy neboli načítané\n");
+    }
+    else
+    {
+        BLOCK *temp = *start;
+        for (int i = 1; i < counter + 1; i++)
+        {
+            printf("%d:\n", i);
+            printf("ID: %s%d%s \t %s \t %g\n", temp->id->bigl, temp->id->number, temp->id->small, temp->Typ_mer_vel, temp->Hodnota);
+            printf("Poz: %8s \t %8s\n", temp->poz_mod->latitude, temp->poz_mod->longitude);
+            printf("DaC: %s \t %s\n", temp->Dat_mer, temp->Cas_mer);
+            temp = temp->next;
+        }
+    }
 }
 
 void p()
@@ -136,6 +160,7 @@ void k(BLOCK **start)
 int main(void)
 {
     char letter;
+    int counter = 0;
     BLOCK *start = NULL;
     do
     {
@@ -143,10 +168,10 @@ int main(void)
         switch (letter)
         {
         case 'n':
-            n(&start);
+            n(&start, &counter);
             break;
         case 'v':
-            v();
+            v(&start, counter);
             break;
         case 'p':
             p();
