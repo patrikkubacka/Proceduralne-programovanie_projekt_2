@@ -124,13 +124,75 @@ void v(BLOCK **start, int counter)
             printf("ID: %s%d%s \t %s \t %g\n", temp->id->bigl, temp->id->number, temp->id->small, temp->Typ_mer_vel, temp->Hodnota);
             printf("Poz: %8s \t %8s\n", temp->poz_mod->latitude, temp->poz_mod->longitude);
             printf("DaC: %s \t %s\n", temp->Dat_mer, temp->Cas_mer);
+            printf("\n");
             temp = temp->next;
         }
     }
 }
 
-void p()
+void p(BLOCK **start, int *counter)
 {
+    int position;
+    printf("zadaj pozíciu nového záznamu:\n");
+    scanf("%d", &position);
+
+    if (position <= 0)
+    {
+        printf("zlá pozícia");
+        return;
+    }
+
+    else
+    {
+        BLOCK *new = (BLOCK *)malloc(sizeof(BLOCK));
+        new->id = (ID *)malloc(sizeof(ID));
+        new->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
+
+        printf("Zadaj ID:\n");
+        scanf("%1s%d%1s", new->id->bigl, &(new->id->number), new->id->small);
+
+        printf("Zadaj pozíciu modulu:\n");
+        scanf("%8s%8s", new->poz_mod->latitude, new->poz_mod->longitude);
+
+        printf("Zadaj typ mer. veličiny:\n");
+        scanf("%2s", new->Typ_mer_vel);
+
+        printf("Zadaj hodnotu:\n");
+        scanf("%lf", &(new->Hodnota));
+
+        printf("Zadaj čas merania:\n");
+        scanf("%4s", new->Cas_mer);
+
+        printf("Zadaj dátum merania:\n");
+        scanf("%8s", new->Dat_mer);
+
+        new->next = NULL;
+
+        if (*start == NULL || position == 1)
+        {
+            new->next = *start;
+            *start = new;
+        }
+        else
+        {
+            BLOCK *temp = *start;
+            for (int i = 1; i < position - 1 && temp != NULL; i++)
+            {
+                temp = temp->next;
+            }
+            if (temp == NULL)
+            {
+                printf("zlá pozícia!\n");
+                free(new->id);
+                free(new->poz_mod);
+                free(new);
+                return;
+            }
+            new->next = temp->next;
+            temp->next = new;
+        }
+        (*counter)++;
+    }
 }
 
 void z()
@@ -174,7 +236,7 @@ int main(void)
             v(&start, counter);
             break;
         case 'p':
-            p();
+            p(&start, &counter);
             break;
         case 'z':
             z();
