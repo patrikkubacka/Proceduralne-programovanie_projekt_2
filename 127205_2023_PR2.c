@@ -1,6 +1,7 @@
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct id
 {
@@ -250,8 +251,65 @@ void z(BLOCK **start, int *counter)
     }
 }
 
-void u()
+void u(BLOCK **start, int counter)
 {
+
+    BLOCK *temp_block = (BLOCK *)malloc(sizeof(BLOCK));
+    temp_block->id = (ID *)malloc(sizeof(ID));
+    temp_block->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
+    bool equal = false;
+
+    while (equal == false)
+    {
+        BLOCK *temp1 = *start;
+        BLOCK *temp2 = (*start)->next;
+        equal = true;
+
+        while (temp2 != NULL)
+        {
+            if ((strcmp(temp1->Dat_mer, temp2->Dat_mer) > 0) || (strcmp(temp1->Dat_mer, temp2->Dat_mer) == 0 && strcmp(temp1->Cas_mer, temp2->Cas_mer) > 0))
+            {
+                strcpy(temp_block->id->bigl, temp1->id->bigl);
+                temp_block->id->number = temp1->id->number;
+                strcpy(temp_block->id->small, temp1->id->small);
+                strcpy(temp_block->poz_mod->latitude, temp1->poz_mod->latitude);
+                strcpy(temp_block->poz_mod->longitude, temp1->poz_mod->longitude);
+                strcpy(temp_block->Typ_mer_vel, temp1->Typ_mer_vel);
+                temp_block->Hodnota = temp1->Hodnota;
+                strcpy(temp_block->Cas_mer, temp1->Cas_mer);
+                strcpy(temp_block->Dat_mer, temp1->Dat_mer);
+
+                strcpy(temp1->id->small, temp2->id->small);
+                temp1->id->number = temp2->id->number;
+                strcpy(temp1->id->bigl, temp2->id->bigl);
+                strcpy(temp1->poz_mod->latitude, temp2->poz_mod->latitude);
+                strcpy(temp1->poz_mod->longitude, temp2->poz_mod->longitude);
+                strcpy(temp1->Typ_mer_vel, temp2->Typ_mer_vel);
+                temp1->Hodnota = temp2->Hodnota;
+                strcpy(temp1->Cas_mer, temp2->Cas_mer);
+                strcpy(temp1->Dat_mer, temp2->Dat_mer);
+
+                strcpy(temp2->id->bigl, temp_block->id->bigl);
+                temp2->id->number = temp_block->id->number;
+                strcpy(temp2->id->small, temp_block->id->small);
+                strcpy(temp2->poz_mod->latitude, temp_block->poz_mod->latitude);
+                strcpy(temp2->poz_mod->longitude, temp_block->poz_mod->longitude);
+                strcpy(temp2->Typ_mer_vel, temp_block->Typ_mer_vel);
+                temp2->Hodnota = temp_block->Hodnota;
+                strcpy(temp2->Cas_mer, temp_block->Cas_mer);
+                strcpy(temp2->Dat_mer, temp_block->Dat_mer);
+                equal = false;
+            }
+            temp1 = temp1->next;
+            temp2 = temp2->next;
+        }
+    }
+    free(temp_block->id); // uvolnenie pomocneho blocku
+    free(temp_block->poz_mod);
+    free(temp_block);
+
+    printf("Spajany zoznam bol usporiadany.");
+    return;
 }
 
 void r(int counter, BLOCK **start)
@@ -315,10 +373,11 @@ void r(int counter, BLOCK **start)
         strcpy(temp2->Cas_mer, temp_block->Cas_mer);
         strcpy(temp2->Dat_mer, temp_block->Dat_mer);
 
-        free(temp_block->id);
+        free(temp_block->id); // uvolnenie pomocneho blocku
         free(temp_block->poz_mod);
         free(temp_block);
     }
+    return;
 }
 
 void k(BLOCK **start)
@@ -356,7 +415,7 @@ int main(void)
             z(&start, &counter);
             break;
         case 'u':
-            u();
+            u(&start, counter);
             break;
         case 'r':
             r(counter, &start);
