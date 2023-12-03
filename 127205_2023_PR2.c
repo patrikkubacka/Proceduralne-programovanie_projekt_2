@@ -195,8 +195,59 @@ void p(BLOCK **start, int *counter)
     }
 }
 
-void z()
+void z(BLOCK **start, int *counter)
 {
+    char del_id[5];
+    printf("Zadaj ID modulu na vymazanie:\n");
+    scanf("%5s", del_id);
+    del_id[5] = '\0';
+
+    BLOCK *current = *start;
+    BLOCK *previous = NULL;
+    int deleted_records = 0;
+
+    while (current != NULL)
+    {
+        if (strncmp(current->id->bigl, del_id, 1) == 0 &&
+            current->id->number == atoi(del_id + 1) &&
+            strncmp(current->id->small, del_id + 4, 1) == 0)
+        {
+            if (previous == NULL)
+            {
+                *start = current->next;
+                free(current->id);
+                free(current->poz_mod);
+                free(current);
+                current = *start;
+            }
+            else
+            {
+                previous->next = current->next;
+                free(current->id);
+                free(current->poz_mod);
+                free(current);
+                current = previous->next;
+            }
+            (*counter)--;
+            deleted_records++;
+        }
+        else
+        {
+            previous = current;
+            current = current->next;
+        }
+    }
+    if (deleted_records > 0)
+    {
+        for (int i = 0; i < deleted_records; i++)
+        {
+            printf("Zaznam pre ID: %s bol vymazany.\n", del_id);
+        }
+    }
+    else
+    {
+        printf("Zaznam pre ID: %s nebol najdeny.\n", del_id);
+    }
 }
 
 void u()
@@ -239,7 +290,7 @@ int main(void)
             p(&start, &counter);
             break;
         case 'z':
-            z();
+            z(&start, &counter);
             break;
         case 'u':
             u();
