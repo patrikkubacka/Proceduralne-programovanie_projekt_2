@@ -3,20 +3,20 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct id
+typedef struct id // štruktúra pre ID modulu
 {
     char bigl[2];
     int number;
     char small[2];
 } ID;
 
-typedef struct poz_mod
+typedef struct poz_mod // štruktúra pre pozíciu modulu
 {
     char latitude[9];
     char longitude[9];
 } POZ_MOD;
 
-typedef struct block
+typedef struct block // štruktúra pre celý block
 {
     struct id *id;
     struct poz_mod *poz_mod;
@@ -27,19 +27,17 @@ typedef struct block
     struct block *next;
 } BLOCK;
 
-void n(BLOCK **start, int *counter)
+void n(BLOCK **start, int *counter) // funkcia na načítanie záznamov z datalogeru
 {
-    FILE *f = fopen("dataloger_V2.txt", "r");
-    if (f == NULL)
+    FILE *f = fopen("dataloger_V2.txt", "r"); // otvorenie textoveho suboru dataloger
+    if (f == NULL)                            // ak je prázdny vypíše ze zaznamy neboli nacitane
     {
         printf("Zaznamy neboli nacitane!\n");
         return;
     }
     else
     {
-        char buff[100];
-
-        while (*start != NULL)
+        while (*start != NULL) // uvolnenie pamate ak uz existuje zaznam
         {
             BLOCK *temp = *start;
             *start = (*start)->next;
@@ -47,15 +45,20 @@ void n(BLOCK **start, int *counter)
             free(temp->poz_mod);
             free(temp);
         }
+
+        char buff[100];
         *counter = 0;
         char s_number[100];
         BLOCK *temp = *start;
+
+        // načítanie zaznamov zo súboru
         while (fgets(buff, sizeof(buff), f) != NULL)
         {
             BLOCK *new = (BLOCK *)malloc(sizeof(BLOCK));
             new->id = (ID *)malloc(sizeof(ID));
             new->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
 
+            // načítanie riadkov do štruktúr
             fgets(buff, sizeof(buff), f);
             buff[5] = '\0';
             strncpy(new->id->bigl, buff, 1);
@@ -110,7 +113,7 @@ void n(BLOCK **start, int *counter)
     }
 }
 
-void v(BLOCK **start, int counter)
+void v(BLOCK **start, int counter) // funkcia na vypisovanie zaznamov
 {
     if (*start == NULL)
     {
@@ -119,19 +122,19 @@ void v(BLOCK **start, int counter)
     else
     {
         BLOCK *temp = *start;
-        for (int i = 1; i < counter + 1; i++)
+        for (int i = 1; i < counter + 1; i++) // vypisovanie poloziek v zazname
         {
             printf("%d:\n", i);
             printf("ID: %s%d%s \t %s \t %g\n", temp->id->bigl, temp->id->number, temp->id->small, temp->Typ_mer_vel, temp->Hodnota);
             printf("Poz: %8s \t %8s\n", temp->poz_mod->latitude, temp->poz_mod->longitude);
             printf("DaC: %s \t %s\n", temp->Dat_mer, temp->Cas_mer);
             printf("\n");
-            temp = temp->next;
+            temp = temp->next; // posunutie zaznamu na dalsi
         }
     }
 }
 
-void p(BLOCK **start, int *counter)
+void p(BLOCK **start, int *counter) // funkcia na pridanie nového zaznamu
 {
     int position;
     printf("zadaj pozíciu nového záznamu:\n");
@@ -149,6 +152,7 @@ void p(BLOCK **start, int *counter)
         new->id = (ID *)malloc(sizeof(ID));
         new->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
 
+        // nacítavanie údajov do noveho zaznamu
         printf("Zadaj ID:\n");
         scanf("%1s%d%1s", new->id->bigl, &(new->id->number), new->id->small);
 
@@ -168,7 +172,7 @@ void p(BLOCK **start, int *counter)
         scanf("%8s", new->Dat_mer);
 
         new->next = NULL;
-
+        // pridanie noveho bloku na zadanu poziciu v zozname
         if (*start == NULL || position == 1)
         {
             new->next = *start;
@@ -196,7 +200,7 @@ void p(BLOCK **start, int *counter)
     }
 }
 
-void z(BLOCK **start, int *counter)
+void z(BLOCK **start, int *counter) // funkcia na zmazanie bloku zo zaznamu
 {
     char del_id[5];
     printf("Zadaj ID modulu na vymazanie:\n");
@@ -209,10 +213,12 @@ void z(BLOCK **start, int *counter)
 
     while (current != NULL)
     {
+        // porovnavanie zaznamov s rovnakým ID
         if (strncmp(current->id->bigl, del_id, 1) == 0 &&
             current->id->number == atoi(del_id + 1) &&
             strncmp(current->id->small, del_id + 4, 1) == 0)
         {
+            // odstranenie zaznamu
             if (previous == NULL)
             {
                 *start = current->next;
@@ -251,7 +257,7 @@ void z(BLOCK **start, int *counter)
     }
 }
 
-void u(BLOCK **start, int counter)
+void u(BLOCK **start, int counter) // funkcia na usporiadanie zaznamu podla datumu a casu
 {
 
     BLOCK *temp_block = (BLOCK *)malloc(sizeof(BLOCK));
@@ -264,7 +270,7 @@ void u(BLOCK **start, int counter)
         BLOCK *temp1 = *start;
         BLOCK *temp2 = (*start)->next;
         equal = true;
-
+        // bubble sort algoritmus
         while (temp2 != NULL)
         {
             if ((strcmp(temp1->Dat_mer, temp2->Dat_mer) > 0) || (strcmp(temp1->Dat_mer, temp2->Dat_mer) == 0 && strcmp(temp1->Cas_mer, temp2->Cas_mer) > 0))
@@ -308,11 +314,11 @@ void u(BLOCK **start, int counter)
     free(temp_block->poz_mod);
     free(temp_block);
 
-    printf("Spajany zoznam bol usporiadany.");
+    printf("Spajany zoznam bol usporiadany.\n");
     return;
 }
 
-void r(int counter, BLOCK **start)
+void r(int counter, BLOCK **start) // prehodenie zaznamov v zozname
 {
     int c1, c2;
     printf("Zadaj pozíciu 1. záznamu, ktorý chceš prehodiť:\n");
@@ -342,7 +348,7 @@ void r(int counter, BLOCK **start)
         {
             temp2 = temp2->next;
         }
-
+        // prehodenie zaznamu do pomocneho suboru
         strcpy(temp_block->id->bigl, temp1->id->bigl);
         temp_block->id->number = temp1->id->number;
         strcpy(temp_block->id->small, temp1->id->small);
@@ -353,6 +359,7 @@ void r(int counter, BLOCK **start)
         strcpy(temp_block->Cas_mer, temp1->Cas_mer);
         strcpy(temp_block->Dat_mer, temp1->Dat_mer);
 
+        // prehodenie zazanamu na druhy zaznam
         strcpy(temp1->id->small, temp2->id->small);
         temp1->id->number = temp2->id->number;
         strcpy(temp1->id->bigl, temp2->id->bigl);
@@ -380,7 +387,7 @@ void r(int counter, BLOCK **start)
     return;
 }
 
-void k(BLOCK **start)
+void k(BLOCK **start) // uvolnenie pamati
 {
     while (*start != NULL)
     {
