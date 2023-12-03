@@ -314,6 +314,10 @@ void r(int counter, BLOCK **start)
         temp2->Hodnota = temp_block->Hodnota;
         strcpy(temp2->Cas_mer, temp_block->Cas_mer);
         strcpy(temp2->Dat_mer, temp_block->Dat_mer);
+
+        free(temp_block->id);
+        free(temp_block->poz_mod);
+        free(temp_block);
     }
 }
 
