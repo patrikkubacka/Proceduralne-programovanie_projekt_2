@@ -254,8 +254,67 @@ void u()
 {
 }
 
-void r()
+void r(int counter, BLOCK **start)
 {
+    int c1, c2;
+    printf("Zadaj pozíciu 1. záznamu, ktorý chceš prehodiť:\n");
+    scanf("%d", &c1);
+    printf("Zadaj pozíciu 2. záznamu, ktorý chceš prehodiť:\n");
+    scanf("%d", &c2);
+
+    if (c1 == c2 || c1 > counter || c2 > counter)
+    {
+        printf("Zle zadané pozície.\n");
+        return;
+    }
+    else
+    {
+        BLOCK *temp1 = *start;
+        BLOCK *temp2 = *start;
+        BLOCK *temp_block = (BLOCK *)malloc(sizeof(BLOCK));
+        temp_block->id = (ID *)malloc(sizeof(ID));
+        temp_block->poz_mod = (POZ_MOD *)malloc(sizeof(POZ_MOD));
+
+        for (int i = 1; i < c1; i++) // nájde záznam podľa 1. zadanej pozície
+        {
+            temp1 = temp1->next;
+        }
+
+        for (int i = 1; i < c2; i++) // nájde záznam podľa 2. zadanej pozície
+        {
+            temp2 = temp2->next;
+        }
+
+        strcpy(temp_block->id->bigl, temp1->id->bigl);
+        temp_block->id->number = temp1->id->number;
+        strcpy(temp_block->id->small, temp1->id->small);
+        strcpy(temp_block->poz_mod->latitude, temp1->poz_mod->latitude);
+        strcpy(temp_block->poz_mod->longitude, temp1->poz_mod->longitude);
+        strcpy(temp_block->Typ_mer_vel, temp1->Typ_mer_vel);
+        temp_block->Hodnota = temp1->Hodnota;
+        strcpy(temp_block->Cas_mer, temp1->Cas_mer);
+        strcpy(temp_block->Dat_mer, temp1->Dat_mer);
+
+        strcpy(temp1->id->small, temp2->id->small);
+        temp1->id->number = temp2->id->number;
+        strcpy(temp1->id->bigl, temp2->id->bigl);
+        strcpy(temp1->poz_mod->latitude, temp2->poz_mod->latitude);
+        strcpy(temp1->poz_mod->longitude, temp2->poz_mod->longitude);
+        strcpy(temp1->Typ_mer_vel, temp2->Typ_mer_vel);
+        temp1->Hodnota = temp2->Hodnota;
+        strcpy(temp1->Cas_mer, temp2->Cas_mer);
+        strcpy(temp1->Dat_mer, temp2->Dat_mer);
+
+        strcpy(temp2->id->bigl, temp_block->id->bigl);
+        temp2->id->number = temp_block->id->number;
+        strcpy(temp2->id->small, temp_block->id->small);
+        strcpy(temp2->poz_mod->latitude, temp_block->poz_mod->latitude);
+        strcpy(temp2->poz_mod->longitude, temp_block->poz_mod->longitude);
+        strcpy(temp2->Typ_mer_vel, temp_block->Typ_mer_vel);
+        temp2->Hodnota = temp_block->Hodnota;
+        strcpy(temp2->Cas_mer, temp_block->Cas_mer);
+        strcpy(temp2->Dat_mer, temp_block->Dat_mer);
+    }
 }
 
 void k(BLOCK **start)
@@ -296,7 +355,7 @@ int main(void)
             u();
             break;
         case 'r':
-            r();
+            r(counter, &start);
             break;
         case 'k':
             k(&start);
